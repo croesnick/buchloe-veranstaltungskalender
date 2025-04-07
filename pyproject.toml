@@ -1,0 +1,26 @@
+[project]
+name = "buchloe-veranstaltungskalender"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.13.3",
+    "requests>=2.32.3",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.4",
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["buchloe_veranstaltungskalender"]
+
+[project.scripts]
+"fetch-events" = "buchloe_veranstaltungskalender.scraper:run"
+"generate-ical" = "buchloe_veranstaltungskalender.ical:generate"

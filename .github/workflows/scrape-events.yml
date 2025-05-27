@@ -1,0 +1,140 @@
+name: Scrape Events and Deploy to GitHub Pages
+
+on:
+  # Run every 6 hours
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+# Set permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  scrape-and-deploy:
+    runs-on: ubuntu-latest
+    
+    # Set timezone to German locale
+    env:
+      TZ: Europe/Berlin
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install uv package manager
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+      
+      - name: Install project dependencies
+        run: |
+          echo "Installing dependencies with uv..."
+          uv sync
+        
+      - name: Create data directory if it doesn't exist
+        run: |
+          mkdir -p data
+          echo "Data directory created/verified"
+      
+      - name: Run event scraping
+        run: |
+          echo "Starting event scraping..."
+          echo "Current time: $(date)"
+          echo "Timezone: $TZ"
+          
+          # Run the scraper with error handling
+          if uv run start; then
+            echo "✅ Event scraping completed successfully"
+            
+            # Check if events.ics was generated
+            if [ -f "data/events.ics" ]; then
+              echo "✅ events.ics file generated successfully"
+              echo "File size: $(du -h data/events.ics | cut -f1)"
+              echo "Number of lines: $(wc -l < data/events.ics)"
+              
+              # Show first few lines for verification
+              echo "First 10 lines of events.ics:"
+              head -10 data/events.ics
+            else
+              echo "❌ events.ics file was not generated"
+              exit 1
+            fi
+          else
+            echo "❌ Event scraping failed"
+            exit 1
+          fi
+      
+      - name: Prepare GitHub Pages content
+        run: |
+          # Create a clean directory for GitHub Pages
+          mkdir -p _site
+          
+          # Copy the generated events.ics file
+          cp data/events.ics _site/events.ics
+          
+          # Copy the pre-built index.html from assets
+          cp assets/index.html _site/index.html
+          
+          echo "✅ GitHub Pages content prepared"
+          echo "Contents of _site directory:"
+          ls -la _site/
+      
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Workflow Summary
+        run: |
+          echo "## 🗓️ Buchloe Event Calendar Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Scraping Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: Completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC') ($(date '+%Y-%m-%d %H:%M:%S %Z'))" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timezone**: $TZ" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "data/events.ics" ]; then
+            echo "- **Generated File**: \`data/events.ics\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **File Size**: $(du -h data/events.ics | cut -f1)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Number of Lines**: $(wc -l < data/events.ics)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ✅ Successfully deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+          echo "- **Calendar URL**: \`${{ steps.deployment.outputs.page_url }}events.ics\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Website**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⏰ Next Run" >> $GITHUB_STEP_SUMMARY
+          echo "The workflow will run again in 6 hours (every day at 00:00, 06:00, 12:00, 18:00 UTC)." >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📱 Usage Instructions" >> $GITHUB_STEP_SUMMARY
+          echo "To subscribe to this calendar in your calendar app, use this URL:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.deployment.outputs.page_url }}events.ics" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

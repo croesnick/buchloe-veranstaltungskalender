@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buchloe Veranstaltungskalender</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .calendar-link {
+      background: #007bff;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 6px;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    .calendar-link:hover {
+      background: #0056b3;
+    }
+
+    .info-box {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .timestamp {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .url-box {
+      background: #f1f3f4;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      word-break: break-all;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🗓️ Buchloe Veranstaltungskalender</h1>
+
+  <p>Willkommen zum automatisch generierten Veranstaltungskalender für Buchloe!</p>
+
+  <div class="info-box">
+    <h2>📅 Kalender abonnieren</h2>
+    <p>Fügen Sie diesen Kalender zu Ihrer Kalender-App hinzu:</p>
+    <a href="events.ics" class="calendar-link">📥 events.ics herunterladen</a>
+    <p><strong>Oder kopieren Sie diese URL für Ihr Kalender-Abonnement:</strong></p>
+    <div class="url-box" id="calendar-url"></div>
+  </div>
+
+  <div class="info-box">
+    <h2>ℹ️ Informationen</h2>
+    <ul>
+      <li>Der Kalender wird automatisch alle 6 Stunden aktualisiert</li>
+      <li>Datenquelle: <a href="https://www.buchloe.de/freizeit-tourismus/veranstaltungen/" target="_blank">Buchloe
+          Veranstaltungen</a></li>
+      <li>Letztes Update: <span class="timestamp" id="last-update"></span></li>
+    </ul>
+  </div>
+
+  <div class="info-box">
+    <h2>📱 Verwendung</h2>
+    <p><strong>Google Calendar:</strong> Gehen Sie zu "Andere Kalender hinzufügen" → "Über URL" und fügen Sie die obige
+      URL ein.</p>
+    <p><strong>Apple Calendar:</strong> Gehen Sie zu "Datei" → "Neues Kalender-Abonnement" und fügen Sie die URL ein.
+    </p>
+    <p><strong>Outlook:</strong> Gehen Sie zu "Kalender hinzufügen" → "Aus dem Internet" und fügen Sie die URL ein.</p>
+  </div>
+
+  <div class="info-box">
+    <h2>🔧 Technische Details</h2>
+    <ul>
+      <li>Automatisierte Datenerfassung mit Python</li>
+      <li>iCal-Format (RFC 5545) kompatibel</li>
+      <li>Bereitstellung über GitHub Pages</li>
+      <li>Open Source: <a href="https://github.com/crntng/buchloe-veranstaltungskalender" target="_blank">GitHub
+          Repository</a></li>
+    </ul>
+  </div>
+
+  <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #dee2e6; color: #666;">
+    <p>Automatisch generiert mit ❤️ für Buchloe</p>
+  </footer>
+
+  <script>
+    // Set the calendar URL dynamically
+    const calendarUrl = window.location.origin + window.location.pathname + 'events.ics';
+    document.getElementById('calendar-url').textContent = calendarUrl;
+
+    // Set the last update timestamp
+    document.getElementById('last-update').textContent = new Date().toLocaleString('de-DE', {
+      timeZone: 'Europe/Berlin',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) + ' (MEZ/MESZ)';
+  </script>
+</body>
+
+</html>

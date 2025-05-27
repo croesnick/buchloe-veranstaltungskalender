@@ -5,9 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiohttp>=3.9.5",
     "beautifulsoup4>=4.13.3",
     "pydantic>=2.11.2",
-    "requests>=2.32.3",
+    "icalendar>=6.0.1",
+    "pytz>=2024.1",
 ]
 
 [dependency-groups]
@@ -25,5 +27,7 @@ build-backend = "setuptools.build_meta"
 packages = ["buchloe_veranstaltungskalender"]
 
 [project.scripts]
-"fetch-events" = "buchloe_veranstaltungskalender.scraper:run"
-"generate-ical" = "buchloe_veranstaltungskalender.ical:generate"
+start = "buchloe_veranstaltungskalender.main:start"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"

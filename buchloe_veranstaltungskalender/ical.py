@@ -169,7 +169,7 @@ async def save_public_ical(events: List[Event], data_dir: Path) -> Path:
     public_dir.mkdir(parents=True, exist_ok=True)
 
     # Use a consistent filename for public access
-    public_ical_path = public_dir / "buchloe-events.ics"
+    public_ical_path = public_dir / "events.ics"
 
     await save_ical_file(events, public_ical_path)
 

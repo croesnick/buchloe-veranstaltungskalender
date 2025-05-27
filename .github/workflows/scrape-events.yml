@@ -63,14 +63,14 @@ jobs:
             echo "✅ Event scraping completed successfully"
             
             # Check if events.ics was generated
-            if [ -f "data/events.ics" ]; then
+            if [ -f "data/public/events.ics" ]; then
               echo "✅ events.ics file generated successfully"
-              echo "File size: $(du -h data/events.ics | cut -f1)"
-              echo "Number of lines: $(wc -l < data/events.ics)"
+              echo "File size: $(du -h data/public/events.ics | cut -f1)"
+              echo "Number of lines: $(wc -l < data/public/events.ics)"
               
               # Show first few lines for verification
               echo "First 10 lines of events.ics:"
-              head -10 data/events.ics
+              head -10 data/public/events.ics
             else
               echo "❌ events.ics file was not generated"
               exit 1
@@ -86,7 +86,7 @@ jobs:
           mkdir -p _site
           
           # Copy the generated events.ics file
-          cp data/events.ics _site/events.ics
+          cp data/public/events.ics _site/events.ics
           
           # Copy the pre-built index.html from assets
           cp assets/index.html _site/index.html
@@ -116,10 +116,10 @@ jobs:
           echo "- **Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC') ($(date '+%Y-%m-%d %H:%M:%S %Z'))" >> $GITHUB_STEP_SUMMARY
           echo "- **Timezone**: $TZ" >> $GITHUB_STEP_SUMMARY
           
-          if [ -f "data/events.ics" ]; then
-            echo "- **Generated File**: \`data/events.ics\`" >> $GITHUB_STEP_SUMMARY
-            echo "- **File Size**: $(du -h data/events.ics | cut -f1)" >> $GITHUB_STEP_SUMMARY
-            echo "- **Number of Lines**: $(wc -l < data/events.ics)" >> $GITHUB_STEP_SUMMARY
+          if [ -f "data/public/events.ics" ]; then
+            echo "- **Generated File**: \`data/public/events.ics\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **File Size**: $(du -h data/public/events.ics | cut -f1)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Number of Lines**: $(wc -l < data/public/events.ics)" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY

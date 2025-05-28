@@ -52,6 +52,46 @@
       word-break: break-all;
       margin: 0.5rem 0;
     }
+
+    .warning-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid #f39c12;
+    }
+
+    .success-box {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid #28a745;
+    }
+
+    .copy-button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-left: 0.5rem;
+    }
+
+    .copy-button:hover {
+      background: #218838;
+    }
+
+    .url-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
   </style>
 </head>
 
@@ -60,12 +100,73 @@
 
   <p>Willkommen zum automatisch generierten Veranstaltungskalender für Buchloe!</p>
 
+  <div class="success-box" style="margin: 2rem 0;">
+    <h2 style="margin-top: 0;">🎯 Schnellstart: Kalender abonnieren</h2>
+    <p><strong>Empfohlene Methode für automatische Updates:</strong></p>
+    <ol style="margin-left: 1rem; font-size: 1.1em;">
+      <li>Kopieren Sie die URL unten 👇</li>
+      <li>Fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu</li>
+      <li>Fertig! Sie erhalten automatisch alle neuen Veranstaltungen 🎉</li>
+    </ol>
+  </div>
+
   <div class="info-box">
-    <h2>📅 Kalender abonnieren</h2>
-    <p>Fügen Sie diesen Kalender zu Ihrer Kalender-App hinzu:</p>
-    <a href="events.ics" class="calendar-link">📥 events.ics herunterladen</a>
-    <p><strong>Oder kopieren Sie diese URL für Ihr Kalender-Abonnement:</strong></p>
-    <div class="url-box" id="calendar-url"></div>
+    <h2>📅 Kalender abonnieren (empfohlen)</h2>
+    <div class="success-box">
+      <p><strong>✅ So erhalten Sie automatische Updates:</strong></p>
+      <p>Kopieren Sie diese URL und fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu:</p>
+      <div class="url-container">
+        <div class="url-box" id="calendar-url"></div>
+        <button class="copy-button" onclick="copyToClipboard()">📋 Kopieren</button>
+      </div>
+    </div>
+    <div class="warning-box">
+      <p><strong>⚠️ Wichtig:</strong> Verwenden Sie die URL oben für ein Abonnement, nicht den direkten Download. Nur so
+        erhalten Sie automatische Updates alle 6 Stunden!</p>
+    </div>
+  </div>
+
+  <div class="info-box">
+    <h2>📱 So richten Sie das Kalender-Abonnement ein</h2>
+    <p style="margin-bottom: 1.5rem;"><strong>Schritt-für-Schritt Anleitung:</strong></p>
+    
+    <div style="margin-bottom: 1rem;">
+      <p><strong>📱 Google Calendar (Handy-App):</strong></p>
+      <ol style="margin-left: 1rem;">
+        <li>Öffnen Sie die Google Calendar App</li>
+        <li>Tippen Sie auf das ☰ Menü (drei Striche)</li>
+        <li>Wählen Sie "Einstellungen"</li>
+        <li>Tippen Sie auf "Kalender hinzufügen" → "Über URL"</li>
+        <li>Fügen Sie die obige URL ein und bestätigen Sie</li>
+      </ol>
+    </div>
+    <div style="margin-bottom: 1rem;">
+      <p><strong>🖥️ Google Calendar (Web):</strong></p>
+      <ol style="margin-left: 1rem;">
+        <li>Gehen Sie zu <a href="https://calendar.google.com" target="_blank">calendar.google.com</a></li>
+        <li>Klicken Sie links auf das "+" neben "Weitere Kalender"</li>
+        <li>Wählen Sie "Kalender abbonieren" und dann "Per URL"</li>
+        <li>Fügen Sie die obige URL ein und klicken Sie "Kalender hinzufügen"</li>
+      </ol>
+    </div>
+    <div style="margin-bottom: 1rem;">
+      <p><strong>🍎 Apple Calendar (iPhone/iPad):</strong></p>
+      <ol style="margin-left: 1rem;">
+        <li>Öffnen Sie die "Kalender"-App</li>
+        <li>Tippen Sie mittig am unteren Bildschirmrand auf "Kalender"</li>
+        <li>Tippen Sie links-unten auf "Hinzufügen"</li>
+        <li>Wählen Sie "Kalenderabonnement hinzufügen"</li>
+        <li>Fügen Sie die obige URL ein und bestätigen Sie mit "Abbonieren"</li>
+      </ol>
+    </div>
+    <div style="margin-bottom: 1rem;">
+      <p><strong>🖥️ Apple Calendar (Mac):</strong></p>
+      <ol style="margin-left: 1rem;">
+        <li>Öffnen Sie die Kalender-App</li>
+        <li>Gehen Sie zu "Datei" → "Neues Kalender-Abonnement"</li>
+        <li>Fügen Sie die obige URL ein und klicken Sie "Abonnieren"</li>
+      </ol>
+    </div>
   </div>
 
   <div class="info-box">
@@ -74,17 +175,8 @@
       <li>Der Kalender wird automatisch alle 6 Stunden aktualisiert</li>
       <li>Datenquelle: <a href="https://www.buchloe.de/freizeit-tourismus/veranstaltungen/" target="_blank">Buchloe
           Veranstaltungen</a></li>
-      <li>Letztes Update: <span class="timestamp" id="last-update"></span></li>
+      <li>Letztes Update: <span class="timestamp" id="last-update">Wird geladen...</span></li>
     </ul>
-  </div>
-
-  <div class="info-box">
-    <h2>📱 Verwendung</h2>
-    <p><strong>Google Calendar:</strong> Gehen Sie zu "Andere Kalender hinzufügen" → "Über URL" und fügen Sie die obige
-      URL ein.</p>
-    <p><strong>Apple Calendar:</strong> Gehen Sie zu "Datei" → "Neues Kalender-Abonnement" und fügen Sie die URL ein.
-    </p>
-    <p><strong>Outlook:</strong> Gehen Sie zu "Kalender hinzufügen" → "Aus dem Internet" und fügen Sie die URL ein.</p>
   </div>
 
   <div class="info-box">
@@ -103,19 +195,95 @@
   </footer>
 
   <script>
-    // Set the calendar URL dynamically
     const calendarUrl = window.location.origin + window.location.pathname + 'events.ics';
     document.getElementById('calendar-url').textContent = calendarUrl;
 
-    // Set the last update timestamp
-    document.getElementById('last-update').textContent = new Date().toLocaleString('de-DE', {
-      timeZone: 'Europe/Berlin',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }) + ' (MEZ/MESZ)';
+    // Set last update timestamp from info.json
+    async function loadLastUpdateTimestamp() {
+      try {
+        const response = await fetch('info.json');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const info = await response.json();
+        
+        // Parse the UTC timestamp and convert to German locale
+        const utcDate = new Date(info.last_updated + ' UTC');
+        const germanTime = utcDate.toLocaleString('de-DE', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'Europe/Berlin'
+        });
+        
+        document.getElementById('last-update').textContent = germanTime;
+      } catch (error) {
+        console.error('Failed to load timestamp from info.json:', error);
+        document.getElementById('last-update').textContent = 'Unbekannt';
+      }
+    }
+    
+    // Load the timestamp when page loads
+    loadLastUpdateTimestamp();
+
+    function copyToClipboard() {
+      const urlText = document.getElementById('calendar-url').textContent;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(urlText)
+          .then(() => showCopySuccess())
+          .catch(() => fallbackCopyToClipboard(urlText));
+      } else {
+        fallbackCopyToClipboard(urlText);
+      }
+    }
+
+    function showCopySuccess() {
+      const button = document.querySelector('.copy-button');
+      const originalText = button.textContent;
+      button.textContent = '✅ Kopiert!';
+      button.style.background = '#20c997';
+
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = '#28a745';
+      }, 2000);
+    }
+
+    function fallbackCopyToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        showCopySuccess();
+      } catch (err) {
+        console.error('Fallback: Failed to copy text', err);
+        showCopyError();
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    function showCopyError() {
+      const button = document.querySelector('.copy-button');
+      const originalText = button.textContent;
+      button.textContent = '❌ Fehler';
+      button.style.background = '#dc3545';
+
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = '#28a745';
+      }, 2000);
+    }
   </script>
 </body>
 

@@ -80,6 +80,26 @@ jobs:
             exit 1
           fi
       
+      - name: Generate info.json metadata
+        run: |
+          echo "Generating info.json metadata file..."
+          
+          # Create _site directory if it doesn't exist
+          mkdir -p _site
+          
+          # Generate info.json with metadata
+          cat > _site/info.json << EOF
+          {
+            "last_updated": "$(date -u '+%Y-%m-%d %H:%M:%S UTC')",
+            "timezone": "Europe/Berlin",
+            "calendar_url": "events.ics"
+          }
+          EOF
+          
+          echo "✅ info.json metadata file generated"
+          echo "Contents of info.json:"
+          cat _site/info.json
+      
       - name: Prepare GitHub Pages content
         run: |
           # Create a clean directory for GitHub Pages

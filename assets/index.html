@@ -5,194 +5,373 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buchloe Veranstaltungskalender</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind Config for shadcn/ui-like styling -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            border: "hsl(214.3 31.8% 91.4%)",
+            input: "hsl(214.3 31.8% 91.4%)",
+            ring: "hsl(222.2 84% 4.9%)",
+            background: "hsl(0 0% 100%)",
+            foreground: "hsl(222.2 84% 4.9%)",
+            primary: {
+              DEFAULT: "hsl(222.2 47.4% 11.2%)",
+              foreground: "hsl(210 40% 98%)",
+            },
+            secondary: {
+              DEFAULT: "hsl(210 40% 96%)",
+              foreground: "hsl(222.2 84% 4.9%)",
+            },
+            destructive: {
+              DEFAULT: "hsl(0 84.2% 60.2%)",
+              foreground: "hsl(210 40% 98%)",
+            },
+            muted: {
+              DEFAULT: "hsl(210 40% 96%)",
+              foreground: "hsl(215.4 16.3% 46.9%)",
+            },
+            accent: {
+              DEFAULT: "hsl(210 40% 96%)",
+              foreground: "hsl(222.2 84% 4.9%)",
+            },
+            popover: {
+              DEFAULT: "hsl(0 0% 100%)",
+              foreground: "hsl(222.2 84% 4.9%)",
+            },
+            card: {
+              DEFAULT: "hsl(0 0% 100%)",
+              foreground: "hsl(222.2 84% 4.9%)",
+            },
+          },
+          borderRadius: {
+            lg: "var(--radius)",
+            md: "calc(var(--radius) - 2px)",
+            sm: "calc(var(--radius) - 4px)",
+          },
+          animation: {
+            "fade-in": "fadeIn 0.5s ease-in-out",
+            "slide-in": "slideIn 0.3s ease-out",
+          },
+          keyframes: {
+            fadeIn: {
+              "0%": { opacity: "0", transform: "translateY(10px)" },
+              "100%": { opacity: "1", transform: "translateY(0)" },
+            },
+            slideIn: {
+              "0%": { transform: "translateX(-10px)", opacity: "0" },
+              "100%": { transform: "translateX(0)", opacity: "1" },
+            },
+          },
+        },
+      },
+    }
+  </script>
+  
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      line-height: 1.6;
-      color: #333;
+    :root {
+      --radius: 0.5rem;
     }
-
-    .calendar-link {
-      background: #007bff;
-      color: white;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 6px;
-      display: inline-block;
-      margin: 1rem 0;
+    
+    /* Custom animations for button states */
+    .copy-button-success {
+      background-color: hsl(142.1 76.2% 36.3%) !important;
+      transform: scale(1.05);
+      transition: all 0.2s ease-in-out;
     }
-
-    .calendar-link:hover {
-      background: #0056b3;
+    
+    .copy-button-error {
+      background-color: hsl(0 84.2% 60.2%) !important;
+      transform: scale(1.05);
+      transition: all 0.2s ease-in-out;
     }
-
-    .info-box {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 6px;
-      padding: 1rem;
-      margin: 1rem 0;
+    
+    /* Smooth transitions for all interactive elements */
+    .transition-all {
+      transition: all 0.2s ease-in-out;
     }
-
-    .timestamp {
-      color: #666;
-      font-size: 0.9em;
-    }
-
-    .url-box {
-      background: #f1f3f4;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
-      word-break: break-all;
-      margin: 0.5rem 0;
-    }
-
-    .warning-box {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      border-radius: 6px;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-left: 4px solid #f39c12;
-    }
-
-    .success-box {
-      background: #d4edda;
-      border: 1px solid #c3e6cb;
-      border-radius: 6px;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-left: 4px solid #28a745;
-    }
-
-    .copy-button {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9em;
-      margin-left: 0.5rem;
-    }
-
-    .copy-button:hover {
-      background: #218838;
-    }
-
-    .url-container {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+    
+    /* Focus styles for accessibility */
+    .focus-ring:focus {
+      outline: 2px solid hsl(222.2 84% 4.9%);
+      outline-offset: 2px;
     }
   </style>
 </head>
 
-<body>
-  <h1>🗓️ Buchloe Veranstaltungskalender</h1>
+<body class="bg-background text-foreground min-h-screen">
+  <div class="container mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <header class="text-center mb-8 animate-fade-in">
+      <h1 class="text-4xl font-bold text-primary mb-4 sm:text-5xl">
+        🗓️ Buchloe Veranstaltungskalender
+      </h1>
+      <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Willkommen zum automatisch generierten Veranstaltungskalender für Buchloe!
+      </p>
+    </header>
 
-  <p>Willkommen zum automatisch generierten Veranstaltungskalender für Buchloe!</p>
-
-  <div class="success-box" style="margin: 2rem 0;">
-    <h2 style="margin-top: 0;">🎯 Schnellstart: Kalender abonnieren</h2>
-    <p><strong>Empfohlene Methode für automatische Updates:</strong></p>
-    <ol style="margin-left: 1rem; font-size: 1.1em;">
-      <li>Kopieren Sie die URL unten 👇</li>
-      <li>Fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu</li>
-      <li>Fertig! Sie erhalten automatisch alle neuen Veranstaltungen 🎉</li>
-    </ol>
-  </div>
-
-  <div class="info-box">
-    <h2>📅 Kalender abonnieren (empfohlen)</h2>
-    <div class="success-box">
-      <p><strong>✅ So erhalten Sie automatische Updates:</strong></p>
-      <p>Kopieren Sie diese URL und fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu:</p>
-      <div class="url-container">
-        <div class="url-box" id="calendar-url"></div>
-        <button class="copy-button" onclick="copyToClipboard()">📋 Kopieren</button>
+    <!-- Quick Start Card -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 shadow-sm animate-slide-in">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+            <span class="text-green-600 text-lg">🎯</span>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h2 class="text-xl font-semibold text-green-800 mb-3">Schnellstart: Kalender abonnieren</h2>
+          <p class="text-green-700 font-medium mb-4">Empfohlene Methode für automatische Updates:</p>
+          <ol class="text-green-700 space-y-2 text-lg">
+            <li class="flex items-center space-x-2">
+              <span class="w-7 h-7 bg-green-200 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">1</span>
+              <span>Kopieren Sie die URL unten 👇</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="w-7 h-7 bg-green-200 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">2</span>
+              <span>Fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <span class="w-7 h-7 bg-green-200 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">3</span>
+              <span>Fertig! Sie erhalten automatisch alle neuen Veranstaltungen 🎉</span>
+            </li>
+          </ol>
+        </div>
       </div>
     </div>
-    <div class="warning-box">
-      <p><strong>⚠️ Wichtig:</strong> Verwenden Sie die URL oben für ein Abonnement, nicht den direkten Download. Nur so
-        erhalten Sie automatische Updates alle 6 Stunden!</p>
-    </div>
-  </div>
 
-  <div class="info-box">
-    <h2>📱 So richten Sie das Kalender-Abonnement ein</h2>
-    <p style="margin-bottom: 1.5rem;"><strong>Schritt-für-Schritt Anleitung:</strong></p>
-    
-    <div style="margin-bottom: 1rem;">
-      <p><strong>📱 Google Calendar (Handy-App):</strong></p>
-      <ol style="margin-left: 1rem;">
-        <li>Öffnen Sie die Google Calendar App</li>
-        <li>Tippen Sie auf das ☰ Menü (drei Striche)</li>
-        <li>Wählen Sie "Einstellungen"</li>
-        <li>Tippen Sie auf "Kalender hinzufügen" → "Über URL"</li>
-        <li>Fügen Sie die obige URL ein und bestätigen Sie</li>
-      </ol>
+    <!-- Calendar Subscription Card -->
+    <div class="bg-card border border-border rounded-lg shadow-sm mb-8">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold text-card-foreground mb-4 flex items-center space-x-2">
+          <span>📅</span>
+          <span>Kalender abonnieren (empfohlen)</span>
+        </h2>
+        
+        <!-- Success Alert -->
+        <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+          <div class="flex items-start space-x-3">
+            <span class="text-green-600 text-lg">✅</span>
+            <div>
+              <p class="font-medium text-green-800 mb-2">So erhalten Sie automatische Updates:</p>
+              <p class="text-green-700 mb-4">Kopieren Sie diese URL und fügen Sie sie als Kalender-Abonnement in Ihrer Kalender-App hinzu:</p>
+              
+              <!-- URL Container -->
+              <div class="flex flex-col sm:flex-row gap-3 items-start">
+                <div class="flex-1 min-w-0">
+                  <div id="calendar-url" class="bg-muted border border-input rounded-md px-3 py-2 text-sm font-mono break-all text-muted-foreground"></div>
+                </div>
+                <button 
+                  onclick="copyToClipboard()" 
+                  class="copy-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all focus-ring flex items-center space-x-2 whitespace-nowrap"
+                >
+                  <span>📋</span>
+                  <span>Kopieren</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Warning Alert -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <div class="flex items-start space-x-3">
+            <span class="text-yellow-600 text-lg">⚠️</span>
+            <div>
+              <p class="font-medium text-yellow-800 mb-1">Wichtig:</p>
+              <p class="text-yellow-700">Verwenden Sie die URL oben für ein Abonnement, nicht den direkten Download. Nur so erhalten Sie automatische Updates alle 6 Stunden!</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div style="margin-bottom: 1rem;">
-      <p><strong>🖥️ Google Calendar (Web):</strong></p>
-      <ol style="margin-left: 1rem;">
-        <li>Gehen Sie zu <a href="https://calendar.google.com" target="_blank">calendar.google.com</a></li>
-        <li>Klicken Sie links auf das "+" neben "Weitere Kalender"</li>
-        <li>Wählen Sie "Kalender abbonieren" und dann "Per URL"</li>
-        <li>Fügen Sie die obige URL ein und klicken Sie "Kalender hinzufügen"</li>
-      </ol>
-    </div>
-    <div style="margin-bottom: 1rem;">
-      <p><strong>🍎 Apple Calendar (iPhone/iPad):</strong></p>
-      <ol style="margin-left: 1rem;">
-        <li>Öffnen Sie die "Kalender"-App</li>
-        <li>Tippen Sie mittig am unteren Bildschirmrand auf "Kalender"</li>
-        <li>Tippen Sie links-unten auf "Hinzufügen"</li>
-        <li>Wählen Sie "Kalenderabonnement hinzufügen"</li>
-        <li>Fügen Sie die obige URL ein und bestätigen Sie mit "Abbonieren"</li>
-      </ol>
-    </div>
-    <div style="margin-bottom: 1rem;">
-      <p><strong>🖥️ Apple Calendar (Mac):</strong></p>
-      <ol style="margin-left: 1rem;">
-        <li>Öffnen Sie die Kalender-App</li>
-        <li>Gehen Sie zu "Datei" → "Neues Kalender-Abonnement"</li>
-        <li>Fügen Sie die obige URL ein und klicken Sie "Abonnieren"</li>
-      </ol>
-    </div>
-  </div>
 
-  <div class="info-box">
-    <h2>ℹ️ Informationen</h2>
-    <ul>
-      <li>Der Kalender wird automatisch alle 6 Stunden aktualisiert</li>
-      <li>Datenquelle: <a href="https://www.buchloe.de/freizeit-tourismus/veranstaltungen/" target="_blank">Buchloe
-          Veranstaltungen</a></li>
-      <li>Letztes Update: <span class="timestamp" id="last-update">Wird geladen...</span></li>
-    </ul>
-  </div>
+    <!-- Setup Instructions Card -->
+    <div class="bg-card border border-border rounded-lg shadow-sm mb-8">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold text-card-foreground mb-4 flex items-center space-x-2">
+          <span>📱</span>
+          <span>So richten Sie das Kalender-Abonnement ein</span>
+        </h2>
+        <p class="text-muted-foreground mb-6 font-medium">Schritt-für-Schritt Anleitung:</p>
+        
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- Google Calendar Mobile -->
+          <div class="bg-secondary rounded-lg p-4">
+            <h3 class="font-semibold text-secondary-foreground mb-3 flex items-center space-x-2">
+              <span>📱</span>
+              <span>Google Calendar (Handy-App)</span>
+            </h3>
+            <ol class="text-sm text-secondary-foreground space-y-2">
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">1</span>
+                <span>Öffnen Sie die Google Calendar App</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">2</span>
+                <span>Tippen Sie auf das ☰ Menü (drei Striche)</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">3</span>
+                <span>Wählen Sie "Einstellungen"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">4</span>
+                <span>Tippen Sie auf "Kalender hinzufügen" → "Über URL"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">5</span>
+                <span>Fügen Sie die obige URL ein und bestätigen Sie</span>
+              </li>
+            </ol>
+          </div>
 
-  <div class="info-box">
-    <h2>🔧 Technische Details</h2>
-    <ul>
-      <li>Automatisierte Datenerfassung mit Python</li>
-      <li>iCal-Format (RFC 5545) kompatibel</li>
-      <li>Bereitstellung über GitHub Pages</li>
-      <li>Open Source: <a href="https://github.com/croesnick/buchloe-veranstaltungskalender" target="_blank">GitHub
-          Repository</a></li>
-    </ul>
-  </div>
+          <!-- Google Calendar Web -->
+          <div class="bg-secondary rounded-lg p-4">
+            <h3 class="font-semibold text-secondary-foreground mb-3 flex items-center space-x-2">
+              <span>🖥️</span>
+              <span>Google Calendar (Web)</span>
+            </h3>
+            <ol class="text-sm text-secondary-foreground space-y-2">
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">1</span>
+                <span>Gehen Sie zu <a href="https://calendar.google.com" target="_blank" class="text-blue-600 hover:text-blue-800 underline">calendar.google.com</a></span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">2</span>
+                <span>Klicken Sie links auf das "+" neben "Weitere Kalender"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">3</span>
+                <span>Wählen Sie "Kalender abbonieren" und dann "Per URL"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">4</span>
+                <span>Fügen Sie die obige URL ein und klicken Sie "Kalender hinzufügen"</span>
+              </li>
+            </ol>
+          </div>
 
-  <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #dee2e6; color: #666;">
-    <p>Automatisch generiert mit ❤️ für Buchloe</p>
-  </footer>
+          <!-- Apple Calendar Mobile -->
+          <div class="bg-secondary rounded-lg p-4">
+            <h3 class="font-semibold text-secondary-foreground mb-3 flex items-center space-x-2">
+              <span>🍎</span>
+              <span>Apple Calendar (iPhone/iPad)</span>
+            </h3>
+            <ol class="text-sm text-secondary-foreground space-y-2">
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">1</span>
+                <span>Öffnen Sie die "Kalender"-App</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">2</span>
+                <span>Tippen Sie mittig am unteren Bildschirmrand auf "Kalender"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">3</span>
+                <span>Tippen Sie links-unten auf "Hinzufügen"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">4</span>
+                <span>Wählen Sie "Kalenderabonnement hinzufügen"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">5</span>
+                <span>Fügen Sie die obige URL ein und bestätigen Sie mit "Abbonieren"</span>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Apple Calendar Mac -->
+          <div class="bg-secondary rounded-lg p-4">
+            <h3 class="font-semibold text-secondary-foreground mb-3 flex items-center space-x-2">
+              <span>🖥️</span>
+              <span>Apple Calendar (Mac)</span>
+            </h3>
+            <ol class="text-sm text-secondary-foreground space-y-2">
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">1</span>
+                <span>Öffnen Sie die Kalender-App</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">2</span>
+                <span>Gehen Sie zu "Datei" → "Neues Kalender-Abonnement"</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-medium mt-0.5 flex-shrink-0">3</span>
+                <span>Fügen Sie die obige URL ein und klicken Sie "Abonnieren"</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Card -->
+    <div class="bg-card border border-border rounded-lg shadow-sm mb-8">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold text-card-foreground mb-4 flex items-center space-x-2">
+          <span>ℹ️</span>
+          <span>Informationen</span>
+        </h2>
+        <ul class="space-y-3 text-muted-foreground">
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Der Kalender wird automatisch alle 6 Stunden aktualisiert</span>
+          </li>
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Datenquelle: <a href="https://www.buchloe.de/freizeit-tourismus/veranstaltungen/" target="_blank" class="text-blue-600 hover:text-blue-800 underline">Buchloe Veranstaltungen</a></span>
+          </li>
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Letztes Update: <span class="font-mono text-sm" id="last-update">Wird geladen...</span></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Technical Details Card -->
+    <div class="bg-card border border-border rounded-lg shadow-sm mb-8">
+      <div class="p-6">
+        <h2 class="text-2xl font-semibold text-card-foreground mb-4 flex items-center space-x-2">
+          <span>🔧</span>
+          <span>Technische Details</span>
+        </h2>
+        <ul class="space-y-3 text-muted-foreground">
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Automatisierte Datenerfassung mit Python</span>
+          </li>
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>iCal-Format (RFC 5545) kompatibel</span>
+          </li>
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Bereitstellung über GitHub Pages</span>
+          </li>
+          <li class="flex items-start space-x-3">
+            <span class="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Open Source: <a href="https://github.com/croesnick/buchloe-veranstaltungskalender" target="_blank" class="text-blue-600 hover:text-blue-800 underline">GitHub Repository</a></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-border pt-6 mt-8">
+      <p class="text-center text-muted-foreground">
+        Automatisch generiert mit ❤️ für Buchloe
+      </p>
+    </footer>
+  </div>
 
   <script>
     const calendarUrl = window.location.origin + window.location.pathname + 'events.ics';
@@ -242,13 +421,13 @@
 
     function showCopySuccess() {
       const button = document.querySelector('.copy-button');
-      const originalText = button.textContent;
-      button.textContent = '✅ Kopiert!';
-      button.style.background = '#20c997';
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span>✅</span><span>Kopiert!</span>';
+      button.classList.add('copy-button-success');
 
       setTimeout(() => {
-        button.textContent = originalText;
-        button.style.background = '#28a745';
+        button.innerHTML = originalText;
+        button.classList.remove('copy-button-success');
       }, 2000);
     }
 
@@ -275,13 +454,13 @@
 
     function showCopyError() {
       const button = document.querySelector('.copy-button');
-      const originalText = button.textContent;
-      button.textContent = '❌ Fehler';
-      button.style.background = '#dc3545';
+      const originalText = button.innerHTML;
+      button.innerHTML = '<span>❌</span><span>Fehler</span>';
+      button.classList.add('copy-button-error');
 
       setTimeout(() => {
-        button.textContent = originalText;
-        button.style.background = '#28a745';
+        button.innerHTML = originalText;
+        button.classList.remove('copy-button-error');
       }, 2000);
     }
   </script>

@@ -1,0 +1,59 @@
+version: 2
+updates:
+  # Production dependencies - weekly updates
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "production"
+    reviewers:
+      - "croesnick"
+    assignees:
+      - "croesnick"
+    allow:
+      # Allow patch and minor updates for production dependencies
+      - dependency-type: "production"
+    groups:
+      production-dependencies:
+        patterns:
+          - "aiohttp*"
+          - "beautifulsoup4*"
+          - "pydantic*"
+          - "icalendar*"
+          - "pytz*"
+
+  # Development dependencies - weekly updates
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "development"
+    allow:
+      # Allow all updates for development dependencies
+      - dependency-type: "development"
+    groups:
+      development-dependencies:
+        patterns:
+          - "pytest*"
+          - "pytest-asyncio*"
+          - "ruff*"
+
+  # Security updates - daily checks
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "dependencies"
+      - "security"
+    allow:
+      # Allow all security updates
+      - dependency-type: "all"
+    reviewers:
+      - "croesnick"
+    assignees:
+      - "croesnick"

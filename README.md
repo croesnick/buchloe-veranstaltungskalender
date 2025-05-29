@@ -114,11 +114,6 @@ Der aktuelle Status der automatischen Aktualisierungen kann im GitHub Actions Ta
 uv run pytest
 ```
 
-### Coding Style
-
-- Typ-Annotationen für alle Funktionen und Variablen
-- Pydantic-Modelle für Datenstrukturen
-
 ## Lizenz
 
 MIT

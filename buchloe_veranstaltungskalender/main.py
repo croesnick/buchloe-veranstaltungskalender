@@ -27,7 +27,7 @@ setup_logging(level=logging.INFO)
 logger = get_logger(__name__)
 
 
-async def main():
+async def main() -> None:
     data_dir = Path("data")
     processed_dir = data_dir / "processed"
 
@@ -80,5 +80,5 @@ async def main():
         logger.error(f"Error processing events: {str(e)}", exc_info=True)
 
 
-def start():
+def start() -> None:
     asyncio.run(main())

@@ -3,6 +3,7 @@ import json
 import locale
 import logging
 from datetime import datetime, time
+from typing import cast
 
 import aiohttp
 from bs4 import BeautifulSoup, Tag
@@ -37,23 +38,34 @@ async def parse_events_from_page(
     soup = BeautifulSoup(content, "html.parser")
 
     # Look for <a class="article"> wrappers that contain the articles
-    article_wrappers = soup.find_all("a", class_="article")
+    article_wrappers_found = soup.find_all("a", class_="article")
 
-    if not article_wrappers:
+    # Declare variable with proper type
+    article_wrappers: list[tuple[Tag | None, Tag | None]]
+
+    if not article_wrappers_found:
         # Fallback to direct article elements for backward compatibility
         articles = soup.find_all("article")
-        article_wrappers = [(None, article) for article in articles]
+        article_wrappers = cast(
+            list[tuple[Tag | None, Tag | None]],
+            [(None, article) for article in articles],
+        )
     else:
         # Extract (wrapper, article) pairs
-        article_wrappers = [
-            (wrapper, wrapper.find("article")) for wrapper in article_wrappers
-        ]
+        article_wrappers = cast(
+            list[tuple[Tag | None, Tag | None]],
+            [
+                (wrapper, wrapper.find("article"))
+                for wrapper in article_wrappers_found
+                if isinstance(wrapper, Tag)
+            ],
+        )
 
     events = []
     tasks = []
 
     for wrapper, article in article_wrappers:
-        if not article:
+        if not isinstance(article, Tag):
             continue
 
         # Extract event URL if wrapper is available
@@ -69,9 +81,9 @@ async def parse_events_from_page(
 
     # Execute all parsing tasks concurrently
     if tasks:
-        events = await asyncio.gather(*tasks, return_exceptions=True)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         # Filter out None results and exceptions
-        events = [event for event in events if isinstance(event, Event)]
+        events = [event for event in results if isinstance(event, Event)]
 
         for event in events:
             logger.info(f"Found event: {event}")
@@ -135,8 +147,8 @@ async def parse_event(
         )
         return None  # Essential information is missing
 
-    start_time = time_ranges.get("start_time")
-    end_time = time_ranges.get("end_time")
+    start_time = time_ranges.get("start_time") if time_ranges else None
+    end_time = time_ranges.get("end_time") if time_ranges else None
 
     start_datetime = (
         datetime.combine(event_date, start_time) if start_time else event_date
@@ -345,7 +357,7 @@ def extract_event_url(article_wrapper: Tag) -> str | None:
         return None
 
     href = article_wrapper.get("href")
-    if not href:
+    if not href or not isinstance(href, str):
         return None
 
     # Convert relative URL to absolute URL
@@ -369,7 +381,7 @@ def parse_contenttable(soup: BeautifulSoup) -> str:
         Bereinigter Beschreibungstext
     """
     contenttable = soup.find("table", class_="contenttable")
-    if not contenttable:
+    if not contenttable or not isinstance(contenttable, Tag):
         return ""
 
     # Extract all text from spans within the table
@@ -406,7 +418,9 @@ async def fetch_full_description(
         Vollständige Beschreibung oder None bei Fehlern
     """
     try:
-        async with session.get(event_url, timeout=10.0) as response:
+        async with session.get(
+            event_url, timeout=aiohttp.ClientTimeout(total=10.0)
+        ) as response:
             if response.status != 200:
                 logger.warning(
                     f"Failed to fetch event detail page: HTTP {response.status}",
@@ -580,7 +594,7 @@ async def scrape_events(fetch_full_descriptions: bool = True) -> list[Event]:
 
 if __name__ == "__main__":
 
-    async def main():
+    async def main() -> None:
         events = await scrape_events()
         print(json.dumps(events, ensure_ascii=False, indent=4))
 

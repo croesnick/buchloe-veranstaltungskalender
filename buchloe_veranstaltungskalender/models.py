@@ -12,7 +12,7 @@ class Event(BaseModel):
     url: str
 
     @model_serializer
-    def serialize_model(self):
+    def serialize_model(self) -> dict[str, str]:
         return {
             "title": self.title,
             "start": self.start.isoformat(),

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from .models import Event
@@ -13,7 +13,7 @@ async def load_events(directory: Path) -> list[Event]:
         return []
 
     # Get most recent file by parsing YYYYMMDD from filename
-    def get_file_date(f: Path):
+    def get_file_date(f: Path) -> date:
         try:
             # Extract date from filename like "events_20240101.json"
             date_str = f.stem.split("_")[-1]
@@ -29,10 +29,14 @@ async def load_events(directory: Path) -> list[Event]:
     return [Event(**event) for event in events_data]
 
 
-async def save_events(events: list[Event], directory: Path):
+async def save_events(events: list[Event], directory: Path | str) -> None:
     """Save events to a new JSON file"""
     if not events:
         return
+
+    # Convert string to Path if needed
+    if isinstance(directory, str):
+        directory = Path(directory)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"processed_events_{timestamp}.json"

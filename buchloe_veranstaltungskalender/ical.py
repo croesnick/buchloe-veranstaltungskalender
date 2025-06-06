@@ -5,11 +5,11 @@ for calendar subscription and import functionality.
 """
 
 import logging
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
-import pytz
-from icalendar import Calendar
+import pytz  # type: ignore
+from icalendar import Calendar  # type: ignore
 from icalendar import Event as ICalEvent
 
 from .ical_formatter import (
@@ -112,7 +112,7 @@ async def _convert_event_to_ical(event: Event) -> ICalEvent:
     return ical_event
 
 
-def _ensure_timezone_aware(dt) -> datetime:
+def _ensure_timezone_aware(dt: date | datetime) -> datetime:
     """Ensure datetime object is timezone-aware
 
     Args:
@@ -121,15 +121,15 @@ def _ensure_timezone_aware(dt) -> datetime:
     Returns:
         Timezone-aware datetime object
     """
-    if hasattr(dt, "hour"):  # It's a datetime
+    if isinstance(dt, datetime):
         if dt.tzinfo is None:
             # Assume local timezone (Buchloe)
-            return BUCHLOE_TZ.localize(dt)
+            return BUCHLOE_TZ.localize(dt)  # type: ignore
         return dt
     else:  # It's a date
         # Convert to datetime at midnight in local timezone
         dt_obj = datetime.combine(dt, datetime.min.time())
-        return BUCHLOE_TZ.localize(dt_obj)
+        return BUCHLOE_TZ.localize(dt_obj)  # type: ignore
 
 
 async def save_ical_file(events: list[Event], output_path: Path) -> None:

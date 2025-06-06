@@ -114,6 +114,19 @@ Der aktuelle Status der automatischen Aktualisierungen kann im GitHub Actions Ta
 uv run pytest
 ```
 
+### Code-Qualität
+
+```bash
+# Linting mit ruff
+uv run ruff check .
+
+# Code-Formatierung
+uv run ruff format .
+
+# Typ-Prüfung mit mypy
+uv run mypy buchloe_veranstaltungskalender/
+```
+
 ### Coding Style
 
 - Typ-Annotationen für alle Funktionen und Variablen

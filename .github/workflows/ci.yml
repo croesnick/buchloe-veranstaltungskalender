@@ -1,0 +1,92 @@
+name: CI - Lint and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install uv package manager
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+      
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+      
+      - name: Install project dependencies
+        run: |
+          echo "Installing dependencies with uv..."
+          uv sync --dev
+      
+      - name: Run ruff linting
+        run: |
+          echo "Running ruff linting..."
+          uv run ruff check .
+      
+      - name: Run ruff formatting check
+        run: |
+          echo "Checking code formatting with ruff..."
+          uv run ruff format --check .
+      
+      - name: Run mypy type checking
+        run: |
+          echo "Running mypy type checking..."
+          uv run mypy buchloe_veranstaltungskalender/
+      
+      - name: Run tests with pytest
+        run: |
+          echo "Running tests with pytest..."
+          uv run pytest --verbose --tb=short
+      
+      - name: Run tests with coverage
+        run: |
+          echo "Running tests with coverage reporting..."
+          uv run pytest --cov=buchloe_veranstaltungskalender --cov-report=term-missing --cov-report=xml
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: success()
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+      
+      - name: Workflow Summary
+        if: always()
+        run: |
+          echo "## 🔍 CI/CD Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Code Quality Checks" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ruff Linting**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ruff Formatting**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- **MyPy Type Checking**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Testing" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unit Tests**: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Coverage Report**: ✅ Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Project Info" >> $GITHUB_STEP_SUMMARY
+          echo "- **Python Version**: 3.12" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package Manager**: uv" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY

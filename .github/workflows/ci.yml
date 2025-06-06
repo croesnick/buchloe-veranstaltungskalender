@@ -64,7 +64,7 @@ jobs:
           uv run pytest --cov=buchloe_veranstaltungskalender --cov-report=term-missing --cov-report=xml
       
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: success()
         with:
           file: ./coverage.xml

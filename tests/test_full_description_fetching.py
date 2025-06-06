@@ -1,11 +1,12 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from bs4 import BeautifulSoup
-import aiohttp
-from unittest.mock import AsyncMock, MagicMock
+
 from buchloe_veranstaltungskalender.scraper import (
     extract_event_url,
-    parse_contenttable,
     fetch_full_description,
+    parse_contenttable,
     parse_events_from_page,
 )
 

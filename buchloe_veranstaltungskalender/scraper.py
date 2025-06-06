@@ -1,21 +1,21 @@
-import sys
-import aiohttp
-from bs4 import BeautifulSoup, Tag
 import asyncio
 import json
-from datetime import datetime, time
 import locale
 import logging
-from typing import Optional, Dict, List, Tuple
+from datetime import datetime, time
+
+import aiohttp
+from bs4 import BeautifulSoup, Tag
+
+from .logging_config import get_logger, setup_logging
 from .models import Event
-from .logging_config import setup_logging, get_logger
 
 # Initialize logging configuration
 setup_logging(level=logging.INFO)
 logger = get_logger("buchloe-scraper")
 
 
-async def fetch_page(session: aiohttp.ClientSession, url: str) -> Optional[bytes]:
+async def fetch_page(session: aiohttp.ClientSession, url: str) -> bytes | None:
     """
     Fetches the HTML content of the given URL using aiohttp.
     """
@@ -27,9 +27,9 @@ async def fetch_page(session: aiohttp.ClientSession, url: str) -> Optional[bytes
 
 async def parse_events_from_page(
     content: bytes,
-    session: Optional[aiohttp.ClientSession] = None,
+    session: aiohttp.ClientSession | None = None,
     fetch_full_descriptions: bool = True,
-) -> List[Event]:
+) -> list[Event]:
     """
     Parses the HTML content of a page and returns a list of events.
     Enhanced to support full description fetching from detail pages.
@@ -81,9 +81,9 @@ async def parse_events_from_page(
 
 async def parse_event(
     article: Tag,
-    event_url: Optional[str] = None,
-    session: Optional[aiohttp.ClientSession] = None,
-) -> Optional[Event]:
+    event_url: str | None = None,
+    session: aiohttp.ClientSession | None = None,
+) -> Event | None:
     """
     Parses a single event article and extracts event data.
     Enhanced to handle 'Noch bis' date patterns, description extraction,
@@ -119,7 +119,7 @@ async def parse_event(
                 description = full_description
         except Exception as e:
             logger.warning(
-                f"Failed to fetch full description, using short description",
+                "Failed to fetch full description, using short description",
                 extra={"url": event_url, "error": str(e)},
             )
 
@@ -153,7 +153,7 @@ async def parse_event(
     )
 
 
-def parse_event_sync(article: Tag) -> Optional[Event]:
+def parse_event_sync(article: Tag) -> Event | None:
     """
     Synchronous wrapper for parse_event for backward compatibility.
     This version does not fetch full descriptions from detail pages.
@@ -196,7 +196,7 @@ def detect_date_pattern(article: Tag) -> str:
     return "unknown"
 
 
-def extract_date_components(article: Tag) -> Dict[str, str]:
+def extract_date_components(article: Tag) -> dict[str, str]:
     """
     Extracts date components from the article element.
 
@@ -214,7 +214,7 @@ def extract_date_components(article: Tag) -> Dict[str, str]:
     }
 
 
-def parse_date_with_pattern(components: Dict[str, str]) -> Optional[datetime]:
+def parse_date_with_pattern(components: dict[str, str]) -> datetime | None:
     """
     Parses date components considering the detected pattern.
 
@@ -331,7 +331,7 @@ def parse_description(article: Tag) -> str:
     return cleaned_text
 
 
-def extract_event_url(article_wrapper: Tag) -> Optional[str]:
+def extract_event_url(article_wrapper: Tag) -> str | None:
     """
     Extrahiert die Event-URL aus dem <a> Wrapper-Element.
 
@@ -394,7 +394,7 @@ def parse_contenttable(soup: BeautifulSoup) -> str:
 
 async def fetch_full_description(
     session: aiohttp.ClientSession, event_url: str
-) -> Optional[str]:
+) -> str | None:
     """
     Ruft die vollständige Beschreibung von der Event-Detail-Seite ab.
 
@@ -423,13 +423,13 @@ async def fetch_full_description(
                 return full_description
             else:
                 logger.warning(
-                    f"No contenttable found on detail page", extra={"url": event_url}
+                    "No contenttable found on detail page", extra={"url": event_url}
                 )
                 return None
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.warning(
-            f"Timeout while fetching event detail page", extra={"url": event_url}
+            "Timeout while fetching event detail page", extra={"url": event_url}
         )
         return None
     except Exception as e:
@@ -450,7 +450,7 @@ def get_text_from_element(parent: Tag, tag: str, class_name: str) -> str:
 
 def parse_date(
     dayname: str, day: str, month: str, year: str, pattern: str = "normal"
-) -> Optional[datetime]:
+) -> datetime | None:
     """
     Parses date components and returns a datetime object.
     Maintained for backward compatibility.
@@ -485,7 +485,7 @@ def set_german_locale() -> None:
             locale.setlocale(locale.LC_TIME, "German_Germany")
 
 
-def parse_time(time_text: str) -> Optional[Dict[str, time]]:
+def parse_time(time_text: str) -> dict[str, time] | None:
     """
     Parses the time text and returns a dictionary with start and end times as time objects.
     """
@@ -508,7 +508,7 @@ def parse_time(time_text: str) -> Optional[Dict[str, time]]:
     return time_data if time_data else None
 
 
-def parse_time_string(time_str: Optional[str]) -> Optional[time]:
+def parse_time_string(time_str: str | None) -> time | None:
     """
     Parses a time string and returns a time object.
     """
@@ -534,7 +534,7 @@ def parse_location(location_text: str) -> str:
     return location_text.replace("Veranstaltungsort:", "").strip()
 
 
-async def scrape_events(fetch_full_descriptions: bool = True) -> List[Event]:
+async def scrape_events(fetch_full_descriptions: bool = True) -> list[Event]:
     """
     Orchestrates the scraping process and returns all events.
     Enhanced to support full description fetching from detail pages.

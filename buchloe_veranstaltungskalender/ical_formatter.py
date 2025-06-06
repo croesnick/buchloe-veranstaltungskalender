@@ -6,10 +6,9 @@ and description formatting.
 """
 
 import re
-from typing import List
 
 
-def smart_fold_line(line: str, max_length: int = 75) -> List[str]:
+def smart_fold_line(line: str, max_length: int = 75) -> list[str]:
     """
     Fold lines at word boundaries while maintaining RFC 5545 compliance.
 

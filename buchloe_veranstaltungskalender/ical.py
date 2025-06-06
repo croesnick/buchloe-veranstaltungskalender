@@ -5,19 +5,20 @@ for calendar subscription and import functionality.
 """
 
 import logging
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List
-from uuid import uuid4
 
 import pytz
-from icalendar import Calendar, Event as ICalEvent
+from icalendar import Calendar
+from icalendar import Event as ICalEvent
 
+from .ical_formatter import (
+    format_ical_content,
+    format_property_value,
+    preprocess_description,
+)
+from .logging_config import get_logger, setup_logging
 from .models import Event
-from .ical_formatter import format_ical_content, preprocess_description, format_property_value
-
-from .logging_config import setup_logging, get_logger
 
 # Initialize logging configuration
 setup_logging(level=logging.INFO)
@@ -27,7 +28,7 @@ logger = get_logger(__name__)
 BUCHLOE_TZ = pytz.timezone("Europe/Berlin")
 
 
-async def generate_ical(events: List[Event]) -> bytes:
+async def generate_ical(events: list[Event]) -> bytes:
     """Generate iCal calendar from events
 
     Args:
@@ -55,7 +56,7 @@ async def generate_ical(events: List[Event]) -> bytes:
             end=event.end,
             location=format_property_value("LOCATION", event.location),
             description=preprocess_description(event.description or ""),
-            url=event.url
+            url=event.url,
         )
         ical_event = await _convert_event_to_ical(processed_event)
         cal.add_component(ical_event)
@@ -131,7 +132,7 @@ def _ensure_timezone_aware(dt) -> datetime:
         return BUCHLOE_TZ.localize(dt_obj)
 
 
-async def save_ical_file(events: List[Event], output_path: Path) -> None:
+async def save_ical_file(events: list[Event], output_path: Path) -> None:
     """Save events as iCal file
 
     Args:
@@ -155,7 +156,7 @@ async def save_ical_file(events: List[Event], output_path: Path) -> None:
     logger.info(f"Saved {len(events)} events to {output_path}")
 
 
-async def save_public_ical(events: List[Event], data_dir: Path) -> Path:
+async def save_public_ical(events: list[Event], data_dir: Path) -> Path:
     """Save iCal file for public access (GitHub Pages)
 
     Args:

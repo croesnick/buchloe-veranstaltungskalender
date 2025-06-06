@@ -1,10 +1,12 @@
-import pytest
-from pathlib import Path
-from datetime import datetime, timedelta
 import json
+from datetime import datetime, timedelta
+from pathlib import Path
+
+import pytest
+
 from buchloe_veranstaltungskalender.compare import (
-    deduplicate_events,
     compare_events,
+    deduplicate_events,
 )
 from buchloe_veranstaltungskalender.models import Event
 

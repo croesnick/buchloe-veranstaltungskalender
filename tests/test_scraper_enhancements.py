@@ -1,11 +1,12 @@
-import pytest
 from bs4 import BeautifulSoup
-from datetime import datetime
+
 from buchloe_veranstaltungskalender.scraper import (
     detect_date_pattern,
     extract_date_components,
     parse_date_with_pattern,
     parse_description,
+)
+from buchloe_veranstaltungskalender.scraper import (
     parse_event_sync as parse_event,
 )
 

@@ -1,16 +1,14 @@
 import logging
-import sys
-from typing import List
-from .models import Event
 
-from .logging_config import setup_logging, get_logger
+from .logging_config import get_logger, setup_logging
+from .models import Event
 
 # Initialize logging configuration
 setup_logging(level=logging.INFO)
 logger = get_logger(__name__)
 
 
-async def deduplicate_events(events: List[Event]) -> List[Event]:
+async def deduplicate_events(events: list[Event]) -> list[Event]:
     """Remove duplicate events based on key attributes"""
     seen = set()
     unique_events = []
@@ -25,8 +23,8 @@ async def deduplicate_events(events: List[Event]) -> List[Event]:
 
 
 async def compare_events(
-    new_events: List[Event], previous_events: List[Event]
-) -> tuple[List[Event], List[Event]]:
+    new_events: list[Event], previous_events: list[Event]
+) -> tuple[list[Event], list[Event]]:
     """Compare new events with previous events to find differences"""
 
     new_keys = {get_event_key(e): e for e in new_events}

@@ -3,5 +3,24 @@
     "tests"
   ],
   "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  "python.testing.pytestEnabled": true,
+  
+  // Ruff configuration
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  
+  // Use project's uv-managed ruff
+  "ruff.path": ["uv", "run", "ruff"],
+  "ruff.importStrategy": "fromEnvironment",
+  
+  // Enable ruff for linting and formatting
+  "ruff.enable": true,
+  "ruff.organizeImports": true,
+  "ruff.fixAll": true
 }

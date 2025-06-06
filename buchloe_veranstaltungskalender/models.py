@@ -1,12 +1,12 @@
 from datetime import date, datetime
-from typing import Union
+
 from pydantic import BaseModel, model_serializer
 
 
 class Event(BaseModel):
     title: str
-    start: Union[date, datetime]
-    end: Union[date, datetime]
+    start: date | datetime
+    end: date | datetime
     location: str
     description: str
     url: str

@@ -5,13 +5,14 @@ readability while maintaining RFC 5545 compliance.
 """
 
 import pytest
+
 from buchloe_veranstaltungskalender.ical_formatter import (
-    smart_fold_line,
-    optimize_escaping,
-    preprocess_description,
+    _find_best_break_point,
     format_ical_content,
     format_property_value,
-    _find_best_break_point,
+    optimize_escaping,
+    preprocess_description,
+    smart_fold_line,
 )
 
 
@@ -232,7 +233,7 @@ END:VCALENDAR"""
         long_line = "DESCRIPTION:" + "x" * 100
         ical_content = f"""BEGIN:VCALENDAR
 {long_line}
-END:VCALENDAR""".encode("utf-8")
+END:VCALENDAR""".encode()
 
         result = format_ical_content(ical_content)
         result_str = result.decode("utf-8")
@@ -244,9 +245,7 @@ END:VCALENDAR""".encode("utf-8")
 
     def test_unicode_handling(self):
         """Test proper handling of Unicode characters."""
-        ical_content = "BEGIN:VCALENDAR\nSUMMARY:Event with ümlaut and émoji 🎉\nEND:VCALENDAR".encode(
-            "utf-8"
-        )
+        ical_content = "BEGIN:VCALENDAR\nSUMMARY:Event with ümlaut and émoji 🎉\nEND:VCALENDAR".encode()
 
         result = format_ical_content(ical_content)
         result_str = result.decode("utf-8")

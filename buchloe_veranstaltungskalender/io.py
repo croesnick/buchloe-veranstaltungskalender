@@ -1,11 +1,11 @@
 import json
-from pathlib import Path
-from typing import List
 from datetime import datetime
+from pathlib import Path
+
 from .models import Event
 
 
-async def load_events(directory: Path) -> List[Event]:
+async def load_events(directory: Path) -> list[Event]:
     """Load events from the latest JSON file in the data directory"""
     files = list(directory.glob("*.json"))
     if not files:
@@ -29,7 +29,7 @@ async def load_events(directory: Path) -> List[Event]:
     return [Event(**event) for event in events_data]
 
 
-async def save_events(events: List[Event], directory: Path):
+async def save_events(events: list[Event], directory: Path):
     """Save events to a new JSON file"""
     if not events:
         return

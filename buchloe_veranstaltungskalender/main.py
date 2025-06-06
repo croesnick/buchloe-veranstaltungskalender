@@ -16,11 +16,11 @@ The pipeline is started via the main() function which:
 
 import asyncio
 import logging
-import sys
 from datetime import datetime
 from pathlib import Path
-from . import scraper, io, compare, ical
-from .logging_config import setup_logging, get_logger
+
+from . import compare, ical, io, scraper
+from .logging_config import get_logger, setup_logging
 
 # Initialize logging configuration
 setup_logging(level=logging.INFO)
